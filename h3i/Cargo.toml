@@ -15,7 +15,7 @@ rust-version = "1.67"
 clap = "3"
 env_logger = "0.6"
 http = "0.2"
-inquire = "0.6.2"
+inquire = "0.7.5"
 log = { version = "0.4", features = ["std"] }
 mio = { version = "0.8", features = ["net", "os-poll"] }
 octets = { version = "0.3", path = "../octets"}
