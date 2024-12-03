@@ -8,5 +8,19 @@ warning: variable `total_packets` is assigned to, but never used
     = note: `#[warn(unused_variables)]` on by default
 
 warning: `quiche_apps` (lib) generated 1 warning
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.20s
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.51s
      Running `target/debug/quiche-client 'https://127.0.0.1:4433' --no-verify --index test.img`
+connection closed, recv=823461 sent=67715 lost=0 retrans=11 sent_bytes=3179368 recv_bytes=1111661463 lost_bytes=0 [local_addr=0.0.0.0:60091 peer_addr=127.0.0.1:4433 validation_state=Validated active=true recv=823461 sent=67715 lost=0 retrans=11 rtt=3.376808ms min_rtt=Some(228.443µs) rttvar=2.845962ms cwnd=13500 sent_bytes=3179368 recv_bytes=1111661463 lost_bytes=0 stream_retrans_bytes=396 pmtu=1350 delivery_rate=50081]
+Data successfully saved.
+warning: variable `total_packets` is assigned to, but never used
+   --> apps/src/client.rs:255:13
+    |
+255 |     let mut total_packets = 0;
+    |             ^^^^^^^^^^^^^
+    |
+    = note: consider using `_total_packets` instead
+    = note: `#[warn(unused_variables)]` on by default
+
+warning: `quiche_apps` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.31s
+     Running `target/debug/quiche-client 'https://127.0.0.1:4433' --no-verify --index throughput.img`
