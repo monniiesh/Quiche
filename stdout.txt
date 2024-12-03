@@ -1,0 +1,12 @@
+warning: variable `total_packets` is assigned to, but never used
+   --> apps/src/client.rs:255:13
+    |
+255 |     let mut total_packets = 0;
+    |             ^^^^^^^^^^^^^
+    |
+    = note: consider using `_total_packets` instead
+    = note: `#[warn(unused_variables)]` on by default
+
+warning: `quiche_apps` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.20s
+     Running `target/debug/quiche-client 'https://127.0.0.1:4433' --no-verify --index test.img`

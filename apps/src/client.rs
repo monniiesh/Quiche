@@ -56,9 +56,7 @@ pub fn connect(
     let output_sink =
         Rc::new(RefCell::new(output_sink)) as Rc<RefCell<dyn FnMut(_)>>;
     
-    // Newly added
-    let mut file = std::fs::File::create("test.html")
-        .expect("Failed to create file for saving media.");
+
 
     // Setup the event loop.
     let mut poll = mio::Poll::new().unwrap();
@@ -254,6 +252,7 @@ pub fn connect(
     let app_data_start = std::time::Instant::now();
 
     let mut pkt_count = 0;
+    let mut total_packets = 0;
 
     let mut scid_sent = false;
     let mut new_path_probed = false;
@@ -302,6 +301,7 @@ pub fn connect(
                         )));
                     },
                 };
+                // total_packets += 1;
 
                 trace!("{}: got {} bytes", local_addr, len);
 
@@ -312,9 +312,10 @@ pub fn connect(
                         let mut f = std::io::BufWriter::new(f);
                         f.write_all(&buf[..len]).ok();
                     }
-                }
 
-                pkt_count += 1;
+                    pkt_count += 1;
+                    total_packets += 1;
+                }
 
                 let recv_info = quiche::RecvInfo {
                     to: local_addr,
@@ -330,8 +331,6 @@ pub fn connect(
                         continue 'read;
                     },
                 };
-
-                println!("{}", read);
                 trace!("{}: processed {} bytes", local_addr, read);
             }
         }
@@ -339,11 +338,22 @@ pub fn connect(
         trace!("done reading");
 
         if conn.is_closed() {
-            info!(
+            // info!(
+            //     "connection closed, {:?} {:?}",
+            //     conn.stats(),
+            //     conn.path_stats().collect::<Vec<quiche::PathStats>>()
+            // );
+
+            // info!("Total packets received: {}", total_packets);
+            // info!("Total data received: {} bytes", total_data);
+
+            println!(
                 "connection closed, {:?} {:?}",
                 conn.stats(),
                 conn.path_stats().collect::<Vec<quiche::PathStats>>()
             );
+
+            // println!("Total packets received: {}", total_packets);
 
             if !conn.is_established() {
                 error!(
@@ -359,14 +369,6 @@ pub fn connect(
                     std::fs::write(session_file, session).ok();
                 }
             }
-
-            if let Some(h_conn) = http_conn {
-                if h_conn.report_incomplete(&app_data_start) {
-                    return Err(ClientError::HttpFail);
-                }
-            }
-
-            break;
         }
 
         // Create a new application protocol session once the QUIC connection is

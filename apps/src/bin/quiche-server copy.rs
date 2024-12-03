@@ -49,17 +49,9 @@ use quiche_apps::common::*;
 
 use quiche_apps::sendto::*;
 
-use chrono::Local;
-use std::sync::atomic::{AtomicUsize, Ordering};
-use std::sync::Arc;
-use std::thread;
-use std::time::Duration;
-
 const MAX_BUF_SIZE: usize = 65507;
 
 const MAX_DATAGRAM_SIZE: usize = 1350;
-
-static TOTAL_PACKET_COUNT: AtomicUsize = AtomicUsize::new(0);
 
 fn main() {
     let mut buf = [0; MAX_BUF_SIZE];
@@ -546,7 +538,6 @@ fn main() {
         // them on the UDP socket, until quiche reports that there are no more
         // packets to be sent.
         continue_write = false;
-        let mut packet_count = 0;
         for client in clients.values_mut() {
             // Reduce max_send_burst by 25% if loss is increasing more than 0.1%.
             let loss_rate =
@@ -558,12 +549,6 @@ fn main() {
                     client.max_send_burst.max(client.max_datagram_size * 10);
                 client.loss_rate = loss_rate;
             }
-
-            // Log the time and packet information
-            let now = Local::now();
-            packet_count += 1;
-            TOTAL_PACKET_COUNT.fetch_add(1, Ordering::SeqCst);
-            // println!("Time: {}, Packet number: {}, Sending packet for client: {:?}", now.format("%Y-%m-%d %H:%M:%S%.3f"), packet_count, client.client_id);
 
             let max_send_burst =
                 client.conn.send_quantum().min(client.max_send_burst) /
@@ -630,16 +615,7 @@ fn main() {
                 continue_write = true;
                 break;
             }
-
-            // Wait for 1 second after every 20 packets
-            if packet_count % 5 == 0 {
-                println!("Waiting for 1 second after sending 20 packets...");
-                thread::sleep(Duration::from_secs(3));
-            }
         }
-
-        // Print the total number of packets sent
-        // println!("Total number of packets sent: {}", TOTAL_PACKET_COUNT.load(Ordering::SeqCst));
 
         // Garbage collect closed connections.
         clients.retain(|_, ref mut c| {

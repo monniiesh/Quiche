@@ -26,7 +26,6 @@
 
 use std::fs::File;
 use std::io::Write;
-use std::env;
 use std::sync::{Arc, Mutex};
 use quiche_apps::args::*;
 use quiche_apps::client::*;
@@ -39,24 +38,9 @@ fn main() {
     let conn_args = CommonArgs::with_docopt(&docopt);
     let args = ClientArgs::with_docopt(&docopt);
 
-    // parse output file name
-    let mut file_name = "video.mp4".to_string();
-    let mut args_iter = env::args();
-
-    while let Some(arg) = args_iter.next() {
-        if arg == "--index" {
-            if let Some(value) = args_iter.next() {
-                file_name = value;
-            } else {
-                eprintln!("Error: --index requires a file name.");
-                std::process::exit(1);
-            }
-        }
-    }
-
     // Open the file for writing
     let file = Arc::new(Mutex::new(
-        File::create(file_name).expect("Failed to create file"),
+        File::create("video.mp4").expect("Failed to create file"),
     ));
 
     // Define the output_sink closure to write data to the file

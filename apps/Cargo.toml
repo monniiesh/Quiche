@@ -31,6 +31,8 @@ ring = "0.17"
 quiche = { path = "../quiche" }
 libc = "0.2"
 nix = { version = "0.27", features = ["net", "socket", "uio"] }
+rand = "0.8"
+chrono = "0.4"
 
 [lib]
 crate-type = ["lib"]
